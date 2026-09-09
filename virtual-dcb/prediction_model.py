@@ -24,37 +24,86 @@ class DCBPredictor:
         self.target_cols = None
         self.dataset_stats = None
         self.model_metrics = None
-        self.load_artifacts()
+        self.load_error = None
+        
+        # Load lightweight JSON metadata immediately
+        self._load_metadata()
+        
+        # Attempt to load binary artifacts, but do not crash module import on cold-start
+        try:
+            self.load_artifacts()
+        except Exception as e:
+            self.load_error = str(e)
+            print(f"[DCBPredictor] Artifact load deferred or encountered issue: {e}")
+
+    def _load_metadata(self):
+        """Load lightweight JSON metadata files (always safe to load)"""
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        model_dir = os.path.join(base_dir, 'model')
+        stats_path = os.path.join(model_dir, 'dataset_stats.json')
+        metrics_path = os.path.join(model_dir, 'model_metrics.json')
+
+        try:
+            if os.path.exists(stats_path):
+                with open(stats_path, 'r') as f:
+                    self.dataset_stats = json.load(f)
+            if os.path.exists(metrics_path):
+                with open(metrics_path, 'r') as f:
+                    self.model_metrics = json.load(f)
+        except Exception as e:
+            print(f"[DCBPredictor] Note: Metadata file read warning: {e}")
+
+    def is_loaded(self):
+        """Check if all ML inference artifacts are in memory"""
+        return self.model is not None and self.scaler is not None
+
+    def ensure_loaded(self):
+        """Ensure artifacts are loaded before prediction; raises on failure"""
+        if not self.is_loaded():
+            self.load_artifacts()
 
     def load_artifacts(self):
         """Load trained ML model, scaler, and metadata artifacts"""
         base_dir = os.path.dirname(os.path.abspath(__file__))
         model_dir = os.path.join(base_dir, 'model')
         
+        model_path = os.path.join(model_dir, 'trained_model.pkl')
+        scaler_path = os.path.join(model_dir, 'scaler.pkl')
+        feature_cols_path = os.path.join(model_dir, 'feature_cols.pkl')
+        target_cols_path = os.path.join(model_dir, 'target_cols.pkl')
+
+        # Detect Git LFS pointer text files
+        def is_lfs_pointer(fp):
+            if os.path.exists(fp) and os.path.getsize(fp) < 1024:
+                try:
+                    with open(fp, 'rb') as f:
+                        return f.read(50).startswith(b'version https://git-lfs')
+                except Exception:
+                    pass
+            return False
+
+        if is_lfs_pointer(model_path) or is_lfs_pointer(scaler_path):
+            err_msg = (
+                f"Model file '{model_path}' is a Git LFS pointer text file (~130 bytes), not the actual serialized model binary. "
+                "Vercel does not pull Git LFS objects by default. Files must be tracked in Git directly as regular files."
+            )
+            self.load_error = err_msg
+            raise RuntimeError(err_msg)
+
+        if not os.path.exists(model_path) or not os.path.exists(scaler_path):
+            err_msg = f"Model artifacts not found in {model_dir}."
+            self.load_error = err_msg
+            raise FileNotFoundError(err_msg)
+
         try:
-            model_path = os.path.join(model_dir, 'trained_model.pkl')
-            scaler_path = os.path.join(model_dir, 'scaler.pkl')
-            feature_cols_path = os.path.join(model_dir, 'feature_cols.pkl')
-            target_cols_path = os.path.join(model_dir, 'target_cols.pkl')
-            stats_path = os.path.join(model_dir, 'dataset_stats.json')
-            metrics_path = os.path.join(model_dir, 'model_metrics.json')
-
-            if not os.path.exists(model_path) or not os.path.exists(scaler_path):
-                raise FileNotFoundError(f"Model artifacts not found in {model_dir}. Please run train_model.py first.")
-
             self.model = joblib.load(model_path)
             self.scaler = joblib.load(scaler_path)
             self.feature_cols = joblib.load(feature_cols_path)
             self.target_cols = joblib.load(target_cols_path)
-
-            with open(stats_path, 'r') as f:
-                self.dataset_stats = json.load(f)
-
-            with open(metrics_path, 'r') as f:
-                self.model_metrics = json.load(f)
-
+            self.load_error = None
             print("[DCBPredictor] Model artifacts loaded successfully.")
         except Exception as e:
+            self.load_error = str(e)
             print(f"[DCBPredictor] Error loading artifacts: {e}")
             raise
 
@@ -166,6 +215,9 @@ class DCBPredictor:
             - is_ood: Boolean flag
             - model_info: Architecture and metrics summary
         """
+        # Ensure model artifacts are loaded
+        self.ensure_loaded()
+
         # Validate inputs
         errors, warnings, domain_status = self.validate_input(input_data)
         if errors:

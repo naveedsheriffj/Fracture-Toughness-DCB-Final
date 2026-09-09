@@ -78,12 +78,21 @@ def model_info():
 
 @app.route('/health')
 def health():
-    """Health check endpoint"""
+    """Health check endpoint with diagnostic status"""
+    is_ready = predictor.is_loaded()
+    if not is_ready:
+        try:
+            predictor.ensure_loaded()
+            is_ready = predictor.is_loaded()
+        except Exception:
+            pass
+
     return jsonify({
-        'status': 'healthy',
-        'model_loaded': predictor.model is not None,
-        'scaler_loaded': predictor.scaler is not None
-    })
+        'status': 'healthy' if is_ready else 'degraded',
+        'model_loaded': predictor.is_loaded(),
+        'scaler_loaded': predictor.scaler is not None,
+        'load_error': predictor.load_error
+    }), (200 if is_ready else 503)
 
 if __name__ == '__main__':
     print("Starting AI-Assisted Virtual DCB Testing Platform...")
