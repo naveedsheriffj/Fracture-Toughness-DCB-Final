@@ -28,7 +28,7 @@ class DCBPredictor:
 
     def load_artifacts(self):
         """Load trained ML model, scaler, and metadata artifacts"""
-        base_dir = os.path.dirname(__file__)
+        base_dir = os.path.dirname(os.path.abspath(__file__))
         model_dir = os.path.join(base_dir, 'model')
         
         try:
