@@ -1,0 +1,54 @@
+{
+    "model_name": "ExtraTreesRegressor (Grouped Specimen DCB Model)",
+    "grouping_column": "Specimen_ID",
+    "unique_specimens_total": 12,
+    "train_specimens": [
+        "DCB-BL-001",
+        "DCB-BL-002",
+        "DCB-BL-003",
+        "DCB-BL-004",
+        "DCB-RE-001",
+        "DCB-RE-002",
+        "DCB-RE-003",
+        "DCB-RE-004"
+    ],
+    "val_specimens": [
+        "DCB-BL-005",
+        "DCB-RE-005"
+    ],
+    "test_specimens": [
+        "DCB-BL-006",
+        "DCB-RE-006"
+    ],
+    "training_samples": 60000,
+    "test_samples": 43730,
+    "training_time_seconds": 0.82,
+    "features": [
+        "E11_GPa",
+        "E22_GPa",
+        "G12_GPa",
+        "Poisson_Ratio",
+        "Ply_Thickness_um",
+        "Loading_Rate_mm_min",
+        "Width_mm",
+        "Thickness_mm",
+        "Initial_Crack_Avg_mm",
+        "Displacement_mm"
+    ],
+    "targets": [
+        "Force_N",
+        "Crack_Length_mm"
+    ],
+    "test_evaluation_unseen_specimens": {
+        "force": {
+            "r2": 0.6076,
+            "mae_N": 5.4743,
+            "rmse_N": 6.6033
+        },
+        "crack_length": {
+            "r2": 0.9212,
+            "mae_mm": 5.1651,
+            "rmse_mm": 7.2271
+        }
+    }
+}

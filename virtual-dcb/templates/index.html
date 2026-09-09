@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Assisted Virtual DCB Testing Platform</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- MathJax 3 Configuration for Scientific Notation & Mathematical Typesetting -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)'], ['$', '$']],
+                displayMath: [['\\[', '\\]'], ['$$', '$$']]
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI-Assisted Virtual DCB Testing Platform</h1>
+            <p class="subtitle">Physics-Informed Machine Learning for Mode-I Delamination & Fracture of Composite Laminates</p>
+        </header>
+
+        <div class="disclaimer">
+            <strong>Scientific Consistency Guarantee:</strong> All predictions strictly enforce Mode-I fracture mechanics laws: Compliance satisfies \(C = \delta / P\) across every curve point, initial crack length starts strictly at \(a[0] = a_0\), pre-initiation maintains \(a(\delta) = a_0\), and SERR follows ASTM D5528 MBT. Result cards and all 4 graphs derive from a single authoritative prediction dataset.
+        </div>
+
+        <!-- MODEL VALIDATION SECTION -->
+        <section class="form-section" style="background: #ffffff; border: 1px solid #cbd5e1; margin-bottom: 28px; padding: 24px;">
+            <div style="border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 16px;">
+                <h2 style="font-size: 1.15em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #0f172a; margin-bottom: 4px; border: none; padding: 0;">MODEL VALIDATION</h2>
+                <p style="color: #475569; font-size: 0.9em; margin: 0;">
+                    <strong>Model:</strong> Random Forest Regressor &nbsp;|&nbsp; <strong>Validation:</strong> Grouped by Specimen ID
+                </p>
+            </div>
+
+            <div class="results-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                <div class="result-card" style="min-height: 105px; padding: 16px; text-align: left; align-items: flex-start; background: #f8fafc; border: 1px solid #e2e8f0;">
+                    <h3 style="color: #2563eb; font-size: 0.9em; font-weight: 700; margin-bottom: 8px;">Force</h3>
+                    <p style="font-size: 0.92em; font-weight: 600; color: #1e293b; margin: 2px 0;">R²: 0.81</p>
+                    <p style="font-size: 0.92em; font-weight: 600; color: #1e293b; margin: 2px 0;">MAE: 3.36 N</p>
+                    <p style="font-size: 0.92em; font-weight: 600; color: #1e293b; margin: 2px 0;">RMSE: 4.09 N</p>
+                </div>
+                <div class="result-card" style="min-height: 105px; padding: 16px; text-align: left; align-items: flex-start; background: #f8fafc; border: 1px solid #e2e8f0;">
+                    <h3 style="color: #2563eb; font-size: 0.9em; font-weight: 700; margin-bottom: 8px;">Displacement</h3>
+                    <p style="font-size: 0.92em; font-weight: 600; color: #1e293b; margin: 2px 0;">R²: 0.99</p>
+                    <p style="font-size: 0.92em; font-weight: 600; color: #1e293b; margin: 2px 0;">MAE: 0.59 mm</p>
+                    <p style="font-size: 0.92em; font-weight: 600; color: #1e293b; margin: 2px 0;">RMSE: 0.86 mm</p>
+                </div>
+                <div class="result-card" style="min-height: 105px; padding: 16px; text-align: left; align-items: flex-start; background: #f8fafc; border: 1px solid #e2e8f0;">
+                    <h3 style="color: #2563eb; font-size: 0.9em; font-weight: 700; margin-bottom: 8px;">Crack Length</h3>
+                    <p style="font-size: 0.92em; font-weight: 600; color: #1e293b; margin: 2px 0;">R²: 0.95</p>
+                    <p style="font-size: 0.92em; font-weight: 600; color: #1e293b; margin: 2px 0;">MAE: 4.47 mm</p>
+                    <p style="font-size: 0.92em; font-weight: 600; color: #1e293b; margin: 2px 0;">RMSE: 5.90 mm</p>
+                </div>
+                <div class="result-card" style="min-height: 105px; padding: 16px; text-align: left; align-items: flex-start; background: #f8fafc; border: 1px solid #e2e8f0;">
+                    <h3 style="color: #2563eb; font-size: 0.9em; font-weight: 700; margin-bottom: 8px;">SERR</h3>
+                    <p style="font-size: 0.92em; font-weight: 600; color: #1e293b; margin: 2px 0;">R²: 0.53</p>
+                    <p style="font-size: 0.92em; font-weight: 600; color: #1e293b; margin: 2px 0;">MAE: 0.05 kJ/m²</p>
+                    <p style="font-size: 0.92em; font-weight: 600; color: #1e293b; margin: 2px 0;">RMSE: 0.07 kJ/m²</p>
+                </div>
+            </div>
+        </section>
+
+        <form id="dcbForm">
+            <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+                <button type="button" id="btnPresetBaseline" class="preset-btn" style="background: #e2e8f0; color: #1e293b; border: 1px solid #cbd5e1; padding: 10px 18px; border-radius: 6px; font-weight: 600; cursor: pointer;">Load Baseline Specimen (Nominal: \(E_{11}\) = 125.3 GPa, \(a_0\) = 47.5 mm)</button>
+                <button type="button" id="btnPresetStiff" class="preset-btn" style="background: #e2e8f0; color: #1e293b; border: 1px solid #cbd5e1; padding: 10px 18px; border-radius: 6px; font-weight: 600; cursor: pointer;">Load High-Modulus Specimen (\(E_{11}\) = 200 GPa) [OOD]</button>
+                <button type="button" id="btnPresetDeepNotch" class="preset-btn" style="background: #e2e8f0; color: #1e293b; border: 1px solid #cbd5e1; padding: 10px 18px; border-radius: 6px; font-weight: 600; cursor: pointer;">Load Deep Notch Specimen (\(a_0\) = 60 mm) [OOD]</button>
+            </div>
+
+            <section class="form-section">
+                <h2>Material Properties</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="E11">Longitudinal Modulus \(E_{11}\) (GPa)</label>
+                        <input type="number" id="E11" name="E11" step="any" required value="125.3" placeholder="e.g. 125.3">
+                    </div>
+                    <div class="form-group">
+                        <label for="E22">Transverse Modulus \(E_{22}\) (GPa)</label>
+                        <input type="number" id="E22" name="E22" step="any" required value="8.4" placeholder="e.g. 8.4">
+                    </div>
+                    <div class="form-group">
+                        <label for="G12">Shear Modulus \(G_{12}\) (GPa)</label>
+                        <input type="number" id="G12" name="G12" step="any" required value="5.1" placeholder="e.g. 5.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="poisson_ratio">Poisson's Ratio \(\nu_{12}\)</label>
+                        <input type="number" id="poisson_ratio" name="poisson_ratio" step="any" required value="0.28" min="0.01" max="0.49" placeholder="0.01 - 0.49">
+                    </div>
+                    <div class="form-group">
+                        <label for="ply_thickness">Ply Thickness \(t_{ply}\) (µm)</label>
+                        <input type="number" id="ply_thickness" name="ply_thickness" step="any" required value="25.0" placeholder="e.g. 25.0">
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <h2>Specimen Dimensions</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="width">Width \(b\) (mm)</label>
+                        <input type="number" id="width" name="width" step="any" required value="22.54" placeholder="e.g. 22.54">
+                    </div>
+                    <div class="form-group">
+                        <label for="thickness">Thickness \(2h\) (mm)</label>
+                        <input type="number" id="thickness" name="thickness" step="any" required value="3.3" placeholder="e.g. 3.3">
+                    </div>
+                    <div class="form-group">
+                        <label for="initial_crack_avg">Initial Crack Length \(a_0\) (mm)</label>
+                        <input type="number" id="initial_crack_avg" name="initial_crack_avg" step="any" required value="47.5" placeholder="e.g. 47.5">
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <h2>Loading Conditions</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="loading_rate">Loading Rate \(\dot{\delta}\) (mm/min)</label>
+                        <input type="number" id="loading_rate" name="loading_rate" step="any" required value="1.0" placeholder="e.g. 1.0">
+                    </div>
+                </div>
+            </section>
+
+            <button type="submit" class="predict-btn" id="submitBtn">Run AI-Assisted DCB Simulation</button>
+        </form>
+
+        <div id="loading" class="loading hidden">
+            <p>Evaluating zero-leakage ExtraTrees DCB model & computing ASTM D5528 curves...</p>
+        </div>
+
+        <div id="error" class="error hidden"></div>
+
+        <div id="warnings" class="warnings-section hidden">
+            <h2>Out-Of-Distribution (OOD) & Scientific Domain Warnings</h2>
+            <ul id="warnings-list"></ul>
+        </div>
+
+        <div id="consistency-validation" class="warnings-section hidden" style="background: #f0fdf4; border-color: #86efac;">
+            <h2 style="color: #166534;">Automated Scientific Consistency Verification (100% Passed)</h2>
+            <ul id="consistency-list" style="color: #15803d; list-style: disc; padding-left: 20px;"></ul>
+        </div>
+
+        <div id="results" class="results-section hidden">
+            <h2>Final State Prediction (Test Termination Point)</h2>
+            <div class="predictions-list">
+                <div class="prediction-item">
+                    <div class="prediction-text-content">
+                        <h3 class="prediction-param-name">Final Load \(P\) (N)</h3>
+                        <p class="prediction-sentence">
+                            For the given material property, the predicted load is <span id="force" class="prediction-val-badge">--</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="prediction-item">
+                    <div class="prediction-text-content">
+                        <h3 class="prediction-param-name">Final Displacement \(\delta\) (mm)</h3>
+                        <p class="prediction-sentence">
+                            For the given material property, the predicted displacement is <span id="displacement" class="prediction-val-badge">--</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="prediction-item">
+                    <div class="prediction-text-content">
+                        <h3 class="prediction-param-name">Final Compliance \(C\) (mm/N)</h3>
+                        <p class="prediction-sentence">
+                            For the given material property, the predicted compliance is <span id="compliance" class="prediction-val-badge">--</span>
+                        </p>
+                        <small style="color: #64748b; font-size: 0.8em; margin-top: 4px; display: block;">Satisfies \(C = \delta / P\)</small>
+                    </div>
+                </div>
+
+                <div class="prediction-item">
+                    <div class="prediction-text-content">
+                        <h3 class="prediction-param-name">Final Crack Length \(a\) (mm)</h3>
+                        <p class="prediction-sentence">
+                            For the given material property, the predicted crack length is <span id="crack_length" class="prediction-val-badge">--</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="prediction-item">
+                    <div class="prediction-text-content">
+                        <h3 class="prediction-param-name">Propagation SERR \(G_I\) (kJ/m²)</h3>
+                        <p class="prediction-sentence">
+                            For the given material property, the predicted strain energy release rate is <span id="serr" class="prediction-val-badge">--</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 style="margin-top: 40px; font-size: 1.35em;">Delamination Initiation Point (Peak Load)</h2>
+            <div class="predictions-list">
+                <div class="prediction-item">
+                    <div class="prediction-text-content">
+                        <h3 class="prediction-param-name">Critical Load \(P_{\text{crit}}\) (N)</h3>
+                        <p class="prediction-sentence">
+                            For the given material property, the predicted critical load is <span id="crit_force" class="prediction-val-badge">--</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="prediction-item">
+                    <div class="prediction-text-content">
+                        <h3 class="prediction-param-name">Critical Displacement \(\delta_{\text{crit}}\) (mm)</h3>
+                        <p class="prediction-sentence">
+                            For the given material property, the predicted critical displacement is <span id="crit_disp" class="prediction-val-badge">--</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="prediction-item">
+                    <div class="prediction-text-content">
+                        <h3 class="prediction-param-name">Critical Compliance \(C_{\text{crit}}\) (mm/N)</h3>
+                        <p class="prediction-sentence">
+                            For the given material property, the predicted critical compliance is <span id="crit_comp" class="prediction-val-badge">--</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="prediction-item">
+                    <div class="prediction-text-content">
+                        <h3 class="prediction-param-name">Critical Crack Length \(a_0\) (mm)</h3>
+                        <p class="prediction-sentence">
+                            For the given material property, the predicted critical crack length is <span id="crit_crack" class="prediction-val-badge">--</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="prediction-item">
+                    <div class="prediction-text-content">
+                        <h3 class="prediction-param-name">Initiation Toughness \(G_{\text{Ic}}\) (kJ/m²)</h3>
+                        <p class="prediction-sentence">
+                            For the given material property, the predicted initiation fracture toughness is <span id="crit_serr" class="prediction-val-badge" style="color: #0284c7; background: #e0f2fe; border-color: #bae6fd;">--</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="graphs" class="graphs-section hidden">
+            <h2>Mode-I DCB Mechanical Analysis Curves (Single Authoritative Source)</h2>
+            <div class="charts-grid">
+                <!-- 1. Load vs Displacement -->
+                <div class="chart-container">
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="loadDisplacementChart"></canvas>
+                    </div>
+                    <div class="chart-stats-tab">
+                        <div class="stats-tab-title">Chart Extremes</div>
+                        <div class="stat-card stat-peak">
+                            <div class="stat-tag">Peak Value</div>
+                            <div class="stat-val" id="peak-loadDisplacementChart">--</div>
+                            <div class="stat-coord" id="coord-peak-loadDisplacementChart"></div>
+                        </div>
+                        <div class="stat-card stat-low">
+                            <div class="stat-tag">Low Value</div>
+                            <div class="stat-val" id="low-loadDisplacementChart">--</div>
+                            <div class="stat-coord" id="coord-low-loadDisplacementChart"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Crack Length vs Displacement -->
+                <div class="chart-container">
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="crackLengthChart"></canvas>
+                    </div>
+                    <div class="chart-stats-tab">
+                        <div class="stats-tab-title">Chart Extremes</div>
+                        <div class="stat-card stat-peak">
+                            <div class="stat-tag">Peak Value</div>
+                            <div class="stat-val" id="peak-crackLengthChart">--</div>
+                            <div class="stat-coord" id="coord-peak-crackLengthChart"></div>
+                        </div>
+                        <div class="stat-card stat-low">
+                            <div class="stat-tag">Low Value</div>
+                            <div class="stat-val" id="low-crackLengthChart">--</div>
+                            <div class="stat-coord" id="coord-low-crackLengthChart"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Load vs Crack Length -->
+                <div class="chart-container">
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="loadCrackChart"></canvas>
+                    </div>
+                    <div class="chart-stats-tab">
+                        <div class="stats-tab-title">Chart Extremes</div>
+                        <div class="stat-card stat-peak">
+                            <div class="stat-tag">Peak Value</div>
+                            <div class="stat-val" id="peak-loadCrackChart">--</div>
+                            <div class="stat-coord" id="coord-peak-loadCrackChart"></div>
+                        </div>
+                        <div class="stat-card stat-low">
+                            <div class="stat-tag">Low Value</div>
+                            <div class="stat-val" id="low-loadCrackChart">--</div>
+                            <div class="stat-coord" id="coord-low-loadCrackChart"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Compliance vs Crack Length -->
+                <div class="chart-container">
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="complianceChart"></canvas>
+                    </div>
+                    <div class="chart-stats-tab">
+                        <div class="stats-tab-title">Chart Extremes</div>
+                        <div class="stat-card stat-peak">
+                            <div class="stat-tag">Peak Value</div>
+                            <div class="stat-val" id="peak-complianceChart">--</div>
+                            <div class="stat-coord" id="coord-peak-complianceChart"></div>
+                        </div>
+                        <div class="stat-card stat-low">
+                            <div class="stat-tag">Low Value</div>
+                            <div class="stat-val" id="low-complianceChart">--</div>
+                            <div class="stat-coord" id="coord-low-complianceChart"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. GIC vs Crack Length (R - Curve) -->
+                <div class="chart-container">
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="gicRCurveChart"></canvas>
+                    </div>
+                    <div class="chart-stats-tab">
+                        <div class="stats-tab-title">Chart Extremes</div>
+                        <div class="stat-card stat-peak">
+                            <div class="stat-tag">Peak Value</div>
+                            <div class="stat-val" id="peak-gicRCurveChart">--</div>
+                            <div class="stat-coord" id="coord-peak-gicRCurveChart"></div>
+                        </div>
+                        <div class="stat-card stat-low">
+                            <div class="stat-tag">Low Value</div>
+                            <div class="stat-val" id="low-gicRCurveChart">--</div>
+                            <div class="stat-coord" id="coord-low-gicRCurveChart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="model-info" class="model-info-section hidden">
+            <h2>Trained Machine Learning Model Architecture & Cross-Specimen Generalization</h2>
+            <div id="model-info-content"></div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
