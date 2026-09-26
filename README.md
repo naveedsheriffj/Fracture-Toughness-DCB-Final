@@ -1,6 +1,8 @@
 # Fracture-Toughness-DCB: AI-Assisted Virtual DCB Testing Platform
 
-A scientific, physics-informed machine learning web platform for simulating and analyzing Mode-I delamination, fracture behavior, and R-curves of Carbon Fiber Reinforced Polymer (CFRP) composite laminates tested under the **ASTM D5528** Double Cantilever Beam (DCB) standard.
+A scientific, physics-informed machine learning platform for simulating and analyzing Mode-I delamination, fracture behavior, and R-curves of Carbon Fiber Reinforced Polymer (CFRP) composite laminates tested under the **ASTM D5528** Double Cantilever Beam (DCB) standard.
+
+Designed to run natively in **Python IDLE** (or terminal) with interactive command menus and multi-panel Matplotlib fracture mechanics plots.
 
 ---
 
@@ -17,13 +19,17 @@ A scientific, physics-informed machine learning web platform for simulating and 
    - **Compliance Law ($C = \delta / P$)**: Specimen compliance satisfies $C(\delta) = \delta / P(\delta)$ across all 70 discrete points with zero mathematical drift.
    - **ASTM D5528 Modified Beam Theory (MBT)**: Mode-I Strain Energy Release Rate ($G_I$) calculated analytically using standard MBT formulation with beam rotation correction ($|\Delta| = 2.5$ mm):
      $$G_I = \frac{3 P \delta}{2 b (a + |\Delta|)}$$
-   - **Single Authoritative Data Source**: All scalar result cards and all 5 interactive charts consume the exact same underlying 70-point prediction curve.
+   - **Single Authoritative Data Source**: All printed tabular outputs and all 5 interactive Matplotlib plots consume the exact same underlying 70-point prediction curve.
    - **Out-of-Distribution (OOD) Domain Evaluation**: Validates user inputs against experimental training distribution bounds and raises advisory warnings for extrapolated parameters.
 
-3. **Standard Scientific Notation & Units**:
-   - All input labels, result cards, and graphs follow international composite fracture mechanics standards with full LaTeX math typesetting via **MathJax 3**.
-   - Individual one-by-one prediction display cards detailing: *"For the given material property, the predicted [parameter] is [value]"*.
-   - Each analysis chart features a dedicated right-side tab displaying the **Peak Value** and **Low Value** along with coordinate locations.
+3. **Multi-Panel Matplotlib Visualizer**:
+   - Generates 5 ASTM D5528 analysis curves simultaneously:
+     1. **Load vs. Displacement ($P - \delta$)** with peak initiation load annotated
+     2. **Crack Length vs. Displacement ($a - \delta$)** showing pre-initiation plateau
+     3. **Load vs. Crack Length ($P - a$)**
+     4. **Compliance vs. Crack Length ($C - a$)**
+     5. **Mode-I Resistance Curve / R-Curve ($G_I - a$)** with $G_{\text{Ic}}$ annotated
+     6. **Fracture Summary Box** with critical values and physics verification checklist
 
 ---
 
@@ -46,61 +52,56 @@ Evaluated across unseen test specimens grouped by `Specimen_ID` with zero data l
 Fracture-Toughness-DCB/
 │
 ├── Final_DCB_Master_Dataset.csv    # Experimental master dataset
+├── run_dcb.py                      # Main interactive runner script for Python IDLE
+├── main.py                         # Clean entrypoint (calls run_dcb.py)
+├── prediction_model.py             # Physics-informed prediction engine (DCBPredictor)
+├── train_model.py                  # Zero-leakage ML training & validation pipeline
+├── test_prediction.py              # Standalone prediction & consistency test harness
 ├── analyze_dataset.py              # Dataset distribution & statistical checks
 ├── check_crack_data.py             # Crack propagation validation script
 ├── check_force_data.py             # Load curve validation script
-├── test_prediction.py              # Standalone prediction test harness
+├── requirements.txt                # Python dependencies (NumPy, SciPy, scikit-learn, pandas, Matplotlib)
 │
-└── virtual-dcb/                    # Full-stack web application
-    ├── app.py                      # Flask backend application & REST API
-    ├── train_model.py              # Zero-leakage ML training & validation pipeline
-    ├── prediction_model.py         # Physics-informed prediction engine (DCBPredictor)
-    ├── requirements.txt            # Python dependencies
-    ├── README.md                   # Platform documentation
-    │
-    ├── dataset/
-    │   └── Final_DCB_Master_Dataset.csv
-    │
-    ├── model/
-    │   ├── trained_model.pkl       # Serialized ExtraTreesRegressor model (Git LFS)
-    │   ├── scaler.pkl              # Fitted StandardScaler feature scaler
-    │   ├── feature_cols.pkl        # Ordered input feature column names
-    │   ├── target_cols.pkl         # Target output column names [Force, Crack]
-    │   ├── dataset_stats.json      # Experimental training domain min/max bounds
-    │   └── model_metrics.json      # Cross-specimen validation metrics
-    │
-    ├── templates/
-    │   └── index.html              # Frontend UI with MathJax 3 & side stats tabs
-    │
-    └── static/
-        ├── style.css               # Responsive styling
-        └── script.js               # Frontend controller, Chart.js lifecycle, extremes tabs
+└── model/                          # Serialized ML artifacts
+    ├── trained_model.pkl           # ExtraTreesRegressor model binary
+    ├── scaler.pkl                  # Fitted StandardScaler feature scaler
+    ├── feature_cols.pkl            # Ordered input feature column names
+    ├── target_cols.pkl             # Target output column names [Force_N, Crack_Length_mm]
+    ├── dataset_stats.json          # Experimental training domain min/max bounds
+    └── model_metrics.json          # Cross-specimen validation metrics
 ```
 
 ---
 
-## Quick Start
+## Quick Start: Running in Python IDLE
 
-### 1. Installation
+### 1. Install Dependencies
+In your terminal or Command Prompt, run:
 ```bash
-# Clone the repository
-git clone https://github.com/naveedsheriffj/Fracture-Toughness-DCB.git
-cd Fracture-Toughness-DCB/virtual-dcb
-
-# Create virtual environment
-python -m venv venv
-.\venv\Scripts\activate   # On Windows
-# source venv/bin/activate  # On Linux/macOS
-
-# Install dependencies
 pip install -r requirements.txt
 ```
 
-### 2. Run Application
-```bash
-python app.py
-```
-Open your browser at **`http://localhost:5000`**.
+### 2. Run in Python IDLE
+1. Open **Python IDLE**.
+2. Go to **File -> Open...** and select `run_dcb.py` (or `main.py`).
+3. Press **`F5`** (or select **Run -> Run Module**).
+4. The interactive console menu will appear in the Python IDLE Shell:
+   ```text
+   Select an action:
+     [1] Run Baseline CFRP Specimen (Nominal: E11=125.3 GPa, a0=47.5 mm)
+     [2] Run High-Modulus Specimen [OOD Demo: E11=200.0 GPa]
+     [3] Run Deep Notch Specimen [OOD Demo: a0=60.0 mm]
+     [4] Enter Custom Specimen Properties
+     [5] Show ML Model Metrics & Validation Summary
+     [6] Retrain Model from Master Dataset
+     [7] Exit
+   ```
+5. Entering `1`, `2`, `3`, or `4` will:
+   - Calculate critical initiation parameters ($P_{\text{crit}}, \delta_{\text{crit}}, C_{\text{crit}}, a_0, G_{\text{Ic}}$).
+   - Calculate test termination parameters ($P_{\text{final}}, \delta_{\text{final}}, C_{\text{final}}, a_{\text{final}}, G_{I,\text{final}}$).
+   - Perform automated scientific consistency audits ($a[0] = a_0$, $C = \delta / P$).
+   - Pop up the interactive **Matplotlib** window showing all 5 fracture curves.
+   - Closing the plot window returns you to the menu to run another simulation.
 
 ---
 

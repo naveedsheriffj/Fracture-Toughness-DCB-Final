@@ -13,7 +13,8 @@ print("AI-Assisted Virtual DCB Testing Platform - Grouped Model Training")
 print("=" * 70)
 
 # 1. Load Dataset
-dataset_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'Final_DCB_Master_Dataset.csv')
+base_dir = os.path.dirname(os.path.abspath(__file__))
+dataset_path = os.path.join(base_dir, 'Final_DCB_Master_Dataset.csv')
 print(f"\n1. Loading dataset from: {dataset_path}")
 df = pd.read_csv(dataset_path)
 print(f"Raw dataset shape: {df.shape}")

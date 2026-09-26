@@ -125,7 +125,7 @@ class DCBPredictor:
             'E11': ("Longitudinal Modulus E11", "GPa"),
             'E22': ("Transverse Modulus E22", "GPa"),
             'G12': ("Shear Modulus G12", "GPa"),
-            'ply_thickness': ("Ply Thickness", "µm"),
+            'ply_thickness': ("Ply Thickness", "um"),
             'loading_rate': ("Loading Rate", "mm/min"),
             'width': ("Specimen Width b", "mm"),
             'thickness': ("Specimen Thickness 2h", "mm"),
@@ -165,7 +165,7 @@ class DCBPredictor:
             'E22': ('E22_GPa', 'GPa', 'E22'),
             'G12': ('G12_GPa', 'GPa', 'G12'),
             'poisson_ratio': ('Poisson_Ratio', '', "Poisson's Ratio"),
-            'ply_thickness': ('Ply_Thickness_um', 'µm', 'Ply Thickness'),
+            'ply_thickness': ('Ply_Thickness_um', 'um', 'Ply Thickness'),
             'loading_rate': ('Loading_Rate_mm_min', 'mm/min', 'Loading Rate'),
             'width': ('Width_mm', 'mm', 'Width b'),
             'thickness': ('Thickness_mm', 'mm', 'Thickness 2h'),
@@ -314,7 +314,7 @@ class DCBPredictor:
             'critical_displacement': f"{crit_entry['displacement']:.4f} mm",
             'critical_compliance': f"{crit_entry['compliance']:.6f} mm/N",
             'critical_crack': f"{crit_entry['crackLength']:.2f} mm",
-            'initiation_Gic': f"{crit_entry['serr']:.4f} kJ/m²",
+            'initiation_Gic': f"{crit_entry['serr']:.4f} kJ/m^2",
             'curve_index': crit_idx
         }
 
@@ -325,7 +325,7 @@ class DCBPredictor:
             'displacement': f"{final_entry['displacement']:.4f} mm",
             'compliance': f"{final_entry['compliance']:.6f} mm/N",
             'crack_length': f"{final_entry['crackLength']:.2f} mm",
-            'serr': f"{final_entry['serr']:.4f} kJ/m²"
+            'serr': f"{final_entry['serr']:.4f} kJ/m^2"
         }
 
         # Format 5 analysis curves mapped directly from the single authoritative prediction_curve

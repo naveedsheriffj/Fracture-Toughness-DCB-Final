@@ -1,5 +1,3 @@
-import sys
-sys.path.append('virtual-dcb')
 from prediction_model import predictor
 
 # Test with the exact input from the user's request
@@ -30,47 +28,55 @@ try:
     results = predictor.predict(test_input)
     
     print("\n" + "=" * 60)
-    print("PREDICTION RESULTS")
+    print("PREDICTION RESULTS (TERMINATION STATE)")
     print("=" * 60)
     
-    force = results['Force_N']
-    displacement = results['Displacement_mm']
-    compliance = results['Compliance_mm_per_N']
-    crack_length = results['Crack_Length_mm']
-    serr = results['SERR_kJ_m2']
+    preds = results['predictions']
+    crit = results['critical_point']
+    curve = results['prediction_curve']
     
-    print(f"Force: {force:.4f} N")
-    print(f"Displacement: {displacement:.4f} mm")
-    print(f"Compliance: {compliance:.6f} mm/N")
-    print(f"Crack Length: {crack_length:.4f} mm")
-    print(f"Strain Energy Release Rate: {serr:.4f} kJ/m²")
+    print(f"Force: {preds['force']}")
+    print(f"Displacement: {preds['displacement']}")
+    print(f"Compliance: {preds['compliance']}")
+    print(f"Crack Length: {preds['crack_length']}")
+    print(f"Strain Energy Release Rate: {preds['serr']}")
+    
+    print("\n" + "=" * 60)
+    print("CRITICAL INITIATION POINT (PEAK LOAD)")
+    print("=" * 60)
+    print(f"Critical Force: {crit['critical_force']}")
+    print(f"Critical Displacement: {crit['critical_displacement']}")
+    print(f"Critical Compliance: {crit['critical_compliance']}")
+    print(f"Critical Crack Length: {crit['critical_crack']}")
+    print(f"Initiation G_Ic: {crit['initiation_Gic']}")
     
     print("\n" + "=" * 60)
     print("PHYSICAL CONSISTENCY CHECKS")
     print("=" * 60)
     
-    # Check compliance consistency
-    calc_compliance = displacement / force
-    compliance_diff = abs(compliance - calc_compliance)
-    print(f"Calculated Compliance (δ/P): {calc_compliance:.6f} mm/N")
-    print(f"Predicted Compliance: {compliance:.6f} mm/N")
+    # Check compliance consistency on final point
+    final_pt = curve[-1]
+    calc_compliance = final_pt['displacement'] / final_pt['load']
+    compliance_diff = abs(final_pt['compliance'] - calc_compliance)
+    print(f"Calculated Compliance (delta/P): {calc_compliance:.6f} mm/N")
+    print(f"Predicted Compliance: {final_pt['compliance']:.6f} mm/N")
     print(f"Difference: {compliance_diff:.8f} mm/N")
-    print(f"Consistency: {'✓ PASS' if compliance_diff < 0.001 else '✗ FAIL'}")
+    print(f"Consistency: {'[PASS]' if compliance_diff < 0.001 else '[FAIL]'}")
     
     # Check crack length consistency
     initial_crack = test_input['initial_crack_avg']
-    crack_consistent = crack_length >= initial_crack
+    crack_consistent = final_pt['crackLength'] >= initial_crack
     print(f"\nInitial Crack Length: {initial_crack:.4f} mm")
-    print(f"Final Crack Length: {crack_length:.4f} mm")
-    print(f"Consistency: {'✓ PASS' if crack_consistent else '✗ FAIL'}")
+    print(f"Final Crack Length: {final_pt['crackLength']:.4f} mm")
+    print(f"Consistency: {'[PASS]' if crack_consistent else '[FAIL]'}")
     
     # Check graph data
-    curve_data = results['curve_data']
-    print(f"\nCurve data points: {len(curve_data['displacement'])}")
-    print(f"Final displacement in curve: {curve_data['displacement'][-1]:.4f} mm")
-    print(f"Final force in curve: {curve_data['force'][-1]:.4f} N")
-    print(f"Final crack length in curve: {curve_data['crack_length'][-1]:.4f} mm")
-    print(f"Graph endpoint matches results: {'✓ PASS' if abs(curve_data['displacement'][-1] - displacement) < 0.01 else '✗ FAIL'}")
+    print(f"\nCurve data points: {len(curve)}")
+    print(f"Initial crack in curve: {curve[0]['crackLength']:.4f} mm")
+    print(f"Final displacement in curve: {curve[-1]['displacement']:.4f} mm")
+    print(f"Final force in curve: {curve[-1]['load']:.4f} N")
+    print(f"Final crack length in curve: {curve[-1]['crackLength']:.4f} mm")
+    print(f"Initial crack starts at a0: {'[PASS]' if curve[0]['crackLength'] == initial_crack else '[FAIL]'}")
     
     if results['warnings']:
         print("\n" + "=" * 60)
