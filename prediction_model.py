@@ -85,7 +85,7 @@ class DCBPredictor:
         if is_lfs_pointer(model_path) or is_lfs_pointer(scaler_path):
             err_msg = (
                 f"Model file '{model_path}' is a Git LFS pointer text file (~130 bytes), not the actual serialized model binary. "
-                "Vercel does not pull Git LFS objects by default. Files must be tracked in Git directly as regular files."
+                "Please ensure Git LFS files have been pulled ('git lfs pull') or the binary model file is present."
             )
             self.load_error = err_msg
             raise RuntimeError(err_msg)
